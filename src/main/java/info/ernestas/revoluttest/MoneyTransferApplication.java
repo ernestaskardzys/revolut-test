@@ -6,7 +6,7 @@ import org.slf4j.LoggerFactory;
 
 public class MoneyTransferApplication {
 
-    private static final Logger logger = LoggerFactory.getLogger(MoneyTransferApplication.class);
+    private static final Logger LOGGER = LoggerFactory.getLogger(MoneyTransferApplication.class);
 
     public static final int PORT = 8080;
 
@@ -18,7 +18,7 @@ public class MoneyTransferApplication {
             server.start();
             server.join();
         } catch (Exception ex) {
-            logger.error("Error occurred while starting Jetty", ex);
+            LOGGER.error("Error occurred while starting Jetty", ex);
             System.exit(1);
         } finally {
             server.stop();
