@@ -12,6 +12,7 @@ import org.eclipse.jetty.server.Response;
 import org.eclipse.jetty.server.Server;
 import org.junit.jupiter.api.*;
 
+import javax.ws.rs.core.MediaType;
 import java.io.IOException;
 
 import static org.hamcrest.MatcherAssert.assertThat;
@@ -23,7 +24,6 @@ public class AccountResourceIT {
     private static final int PORT = 8090;
 
     private static final String ACCOUNT_URL = "http://localhost:8090/account/";
-    private static final String APPLICATION_JSON = "application/json";
     private static final String JOHN_DOE = "John Doe";
 
     private static final JettyServer JETTY_SERVER = new JettyServer();
@@ -82,8 +82,7 @@ public class AccountResourceIT {
         Account janeDoeAccount = JacksonUtil.toObject(janeDoeResponse.getEntity().getContent(), Account.class);
 
         final int amount = 10;
-        final String requestAsJson = "{ \"accountFrom\": \"" + johnDoeAccount.getAccountNumber() + "\", \"accountTo\": \"" + janeDoeAccount.getAccountNumber() + "\", \"amount\": \"" + amount + "\" }";
-        sendPutRequest(ACCOUNT_URL + "/transfer", requestAsJson);
+        transfer(janeDoeAccount, amount);
 
         HttpResponse updatedJohnAccount = executeGetAccountRequest(johnDoeAccount.getAccountNumber());
         Account john = JacksonUtil.toObject(updatedJohnAccount.getEntity().getContent(), Account.class);
@@ -95,13 +94,18 @@ public class AccountResourceIT {
         assertThat(jane.getBalance(), is(janeDoeAccount.getBalance() + amount));
     }
 
+    private void transfer(Account janeDoeAccount, int amount) throws IOException {
+        final String requestAsJson = "{ \"accountFrom\": \"" + johnDoeAccount.getAccountNumber() + "\", \"accountTo\": \"" + janeDoeAccount.getAccountNumber() + "\", \"amount\": \"" + amount + "\" }";
+        sendPutRequest(ACCOUNT_URL + "/transfer", requestAsJson);
+    }
+
     private HttpResponse sendPostRequest(String url, String requestAsJson) throws IOException {
         HttpPost httpPost = new HttpPost(url);
 
         StringEntity entity = new StringEntity(requestAsJson);
         httpPost.setEntity(entity);
-        httpPost.setHeader("Accept", APPLICATION_JSON);
-        httpPost.setHeader("Content-type", APPLICATION_JSON);
+        httpPost.setHeader("Accept", MediaType.APPLICATION_JSON);
+        httpPost.setHeader("Content-type", MediaType.APPLICATION_JSON);
 
         return client.execute(httpPost);
     }
@@ -111,8 +115,8 @@ public class AccountResourceIT {
 
         StringEntity entity = new StringEntity(requestAsJson);
         httpPut.setEntity(entity);
-        httpPut.setHeader("Accept", APPLICATION_JSON);
-        httpPut.setHeader("Content-type", APPLICATION_JSON);
+        httpPut.setHeader("Accept", MediaType.APPLICATION_JSON);
+        httpPut.setHeader("Content-type", MediaType.APPLICATION_JSON);
 
         return client.execute(httpPut);
     }
