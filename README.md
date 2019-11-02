@@ -58,6 +58,15 @@ curl --header "Content-Type: application/json" \
   http://localhost:8080/account/transfer
 ```
 
+- In case error appears, you'd get an exception in JSON format. For instance:
+
+```bash
+{
+    "errorCode":500,
+    "message":"Account fa03cf8812d6bc4e480e64783d866f72d12099aba281981890465d8fa8fceb29 does not have enough balance to transfer 50.0"
+}
+```
+
 ### Technologies used
 
 - Jetty
