@@ -1,7 +1,6 @@
 package info.ernestas.revoluttest;
 
 import info.ernestas.revoluttest.model.Account;
-import info.ernestas.revoluttest.util.JacksonUtil;
 import org.apache.http.HttpResponse;
 import org.apache.http.client.methods.HttpGet;
 import org.apache.http.client.methods.HttpPost;

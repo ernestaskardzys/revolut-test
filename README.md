@@ -20,7 +20,7 @@ $ java -jar build/libs/revolut-test-all.jar
 
 ## Running with Docker
 
-To build the project, run:
+To run the project with Docker, run:
 
 ```bash
 $ docker build -t revolut-rest .

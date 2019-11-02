@@ -1,7 +1,6 @@
-package info.ernestas.revoluttest.util;
+package info.ernestas.revoluttest;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-import info.ernestas.revoluttest.model.Account;
 
 import java.io.IOException;
 import java.io.InputStream;

@@ -4,11 +4,11 @@ import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.ValueSource;
 
 import static org.hamcrest.MatcherAssert.assertThat;
-import static org.hamcrest.Matchers.is;
+import static org.hamcrest.Matchers.matchesPattern;
 
 class AccountNumberUtilTest {
 
-    private static final int ACCOUNT_NUMBER_LENGTH = 64;
+    private static final String ALPHANUMERICAL_64_SYMBOLS_LENGTH = "[A-Za-z0-9]{64}";
 
     @ParameterizedTest
     @ValueSource(strings = {
@@ -19,6 +19,6 @@ class AccountNumberUtilTest {
     void generateAccountNumber(String name) {
         String result = AccountNumberUtil.generateAccountNumber(name);
 
-        assertThat(result.length(), is(ACCOUNT_NUMBER_LENGTH));
+        assertThat(result, matchesPattern(ALPHANUMERICAL_64_SYMBOLS_LENGTH));
     }
 }
