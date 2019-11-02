@@ -21,7 +21,7 @@ public class JettyServer {
 
         ServletHolder servletHolder = servletContextHandler.addServlet(ServletContainer.class, "/*");
         servletHolder.setInitOrder(0);
-        servletHolder.setInitParameter("jersey.config.server.provider.packages", BASE_PACKAGE + "resources");
+        servletHolder.setInitParameter("jersey.config.server.provider.packages", BASE_PACKAGE + "resource");
         servletHolder.setInitParameter("javax.ws.rs.Application", BASE_PACKAGE + "App");
 
         return server;

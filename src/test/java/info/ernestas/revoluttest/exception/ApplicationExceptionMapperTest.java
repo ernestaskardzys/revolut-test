@@ -12,6 +12,8 @@ import static org.hamcrest.Matchers.is;
 
 class ApplicationExceptionMapperTest {
 
+    private static final int INTERNAL_SERVER_ERROR = org.eclipse.jetty.server.Response.SC_INTERNAL_SERVER_ERROR;
+
     private ApplicationExceptionMapper mapper;
 
     @BeforeEach
@@ -25,9 +27,9 @@ class ApplicationExceptionMapperTest {
 
         Response response = mapper.toResponse(exception);
 
-        assertThat(response.getStatus(), is(Response.Status.INTERNAL_SERVER_ERROR.getStatusCode()));
+        assertThat(response.getStatus(), is(INTERNAL_SERVER_ERROR));
         ExceptionDto exceptionDto = (ExceptionDto) response.getEntity();
-        assertThat(exceptionDto.getErrorCode(), is(Response.Status.INTERNAL_SERVER_ERROR.getStatusCode()));
+        assertThat(exceptionDto.getErrorCode(), is(INTERNAL_SERVER_ERROR));
         assertThat(exceptionDto.getMessage(), is(exception.getMessage()));
     }
 }

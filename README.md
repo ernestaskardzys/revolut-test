@@ -2,6 +2,7 @@
 
 - You need to have Java 11 SDK installed on your computer in order to run the application
 - To simplify the application, I did not use many DTOs (and this eliminated the need to have mappers)
+- Each account has 64 symbol length account number (for instance - 54b0c38c723c7852334526fd0127bc165ea0b9d9b4034bb6b93195704766b677), which is similar to the one used by Bitcoin protocol
 - Each account is created with 100 of fake "money" - to simplify the application
 
 ### Compilation

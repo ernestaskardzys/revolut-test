@@ -1,4 +1,4 @@
-package info.ernestas.revoluttest.resources;
+package info.ernestas.revoluttest.resource;
 
 import info.ernestas.revoluttest.model.Account;
 import info.ernestas.revoluttest.model.dto.AccountDto;
