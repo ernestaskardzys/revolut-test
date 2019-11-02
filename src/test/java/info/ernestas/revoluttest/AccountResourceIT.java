@@ -9,6 +9,7 @@ import org.apache.http.client.methods.HttpPut;
 import org.apache.http.entity.StringEntity;
 import org.apache.http.impl.client.CloseableHttpClient;
 import org.apache.http.impl.client.HttpClients;
+import org.eclipse.jetty.server.Response;
 import org.eclipse.jetty.server.Server;
 import org.junit.jupiter.api.*;
 
@@ -25,7 +26,6 @@ public class AccountResourceIT {
     private static final String ACCOUNT_URL = "http://localhost:8090/account/";
     private static final String APPLICATION_JSON = "application/json";
     private static final String JOHN_DOE = "John Doe";
-    private static final int STATUS_CODE_OK = 200;
 
     private static final JettyServer JETTY_SERVER = new JettyServer();
 
@@ -61,7 +61,7 @@ public class AccountResourceIT {
 
     @Test
     void openAccount() {
-        assertThat(johnDoeResponse.getStatusLine().getStatusCode(), is(STATUS_CODE_OK));
+        assertThat(johnDoeResponse.getStatusLine().getStatusCode(), is(Response.SC_OK));
         assertThat(johnDoeAccount.getName(), is(JOHN_DOE));
         assertThat(johnDoeAccount.getAccountNumber(), is(notNullValue()));
         assertThat(johnDoeAccount.getBalance(), is(100.0));
@@ -71,7 +71,7 @@ public class AccountResourceIT {
     void getAccountInformation() throws IOException {
         HttpResponse response = executeGetAccountRequest(johnDoeAccount.getAccountNumber());
 
-        assertThat(response.getStatusLine().getStatusCode(), is(STATUS_CODE_OK));
+        assertThat(response.getStatusLine().getStatusCode(), is(Response.SC_OK));
         assertThat(johnDoeAccount.getName(), is(JOHN_DOE));
         assertThat(johnDoeAccount.getAccountNumber(), is(notNullValue()));
         assertThat(johnDoeAccount.getBalance(), is(100.0));

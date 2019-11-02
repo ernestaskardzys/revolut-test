@@ -1,6 +1,7 @@
 ### Some notes
 
 - You need to have Java 11 SDK installed on your computer in order to run the application
+- To simplify the application, I did not use many DTOs (and this eliminated the need to have mappers)
 - Each account is created with 100 of fake "money" - to simplify the application
 
 ### Compilation
