@@ -1,5 +1,7 @@
 package info.ernestas.revoluttest.repository;
 
+import info.ernestas.revoluttest.data.AccountTestData;
+import info.ernestas.revoluttest.exception.AccountCanNotBeUpdatedException;
 import info.ernestas.revoluttest.model.Account;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -8,18 +10,21 @@ import java.util.Optional;
 
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.is;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
 class AccountRepositoryTest {
 
-    private static final Account FIRST_ACCOUNT = new Account("John Doe", "54b0c38c723c7852334526fd0127bc165ea0b9d9b4034bb6b93195704766b677", 0.0);
-    private static final Account SECOND_ACCOUNT = new Account("Jane Doe", "46c837e7ed8ced857d55dde60a78412b82713a9d22af62c7f593dea7346e2b1e", 0.0);
+    private static final Account FIRST_ACCOUNT = AccountTestData.getJohnDoeAccount();
+    private static final Account SECOND_ACCOUNT = AccountTestData.getJaneDoeAccount();
 
     private AccountRepository accountRepository;
 
     @BeforeEach
     void setUp() {
         accountRepository = new AccountRepository();
+
+        accountRepository.save(FIRST_ACCOUNT);
     }
 
     @Test
@@ -33,7 +38,6 @@ class AccountRepositoryTest {
 
     @Test
     void get() {
-        accountRepository.save(FIRST_ACCOUNT);
         accountRepository.save(SECOND_ACCOUNT);
 
         Optional<Account> secondAccount = accountRepository.get(SECOND_ACCOUNT.getAccountNumber());
@@ -44,10 +48,31 @@ class AccountRepositoryTest {
 
     @Test
     void shouldNotReturnAccount_whenAccountDoesNotExist() {
-        accountRepository.save(FIRST_ACCOUNT);
-
         Optional<Account> secondAccount = accountRepository.get(SECOND_ACCOUNT.getAccountNumber());
 
         assertTrue(secondAccount.isEmpty());
+    }
+
+    @Test
+    void update() {
+        Account johnSmith = new Account("John Smith", "account_number", 100.0);
+        accountRepository.save(johnSmith);
+
+        Account updatedAccount = new Account(johnSmith.getName(), johnSmith.getAccountNumber(), johnSmith.getBalance() + 10);
+
+        accountRepository.update(johnSmith.getAccountNumber(), updatedAccount);
+
+        Account resultingAccount = accountRepository.get(updatedAccount.getAccountNumber()).get();
+
+        assertThat(resultingAccount.getName(), is(updatedAccount.getName()));
+        assertThat(resultingAccount.getAccountNumber(), is(updatedAccount.getAccountNumber()));
+        assertThat(resultingAccount.getBalance(), is(updatedAccount.getBalance()));
+    }
+
+    @Test
+    void accountWillNotBeUpdated_ifItDoesNotExist() {
+        String notExistingAccountNumber = "not_existing_account_number";
+
+        assertThrows(AccountCanNotBeUpdatedException.class, () -> accountRepository.update(notExistingAccountNumber, null));
     }
 }

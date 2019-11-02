@@ -2,6 +2,7 @@ package info.ernestas.revoluttest.service;
 
 import info.ernestas.revoluttest.exception.AccountDoesNotExistException;
 import info.ernestas.revoluttest.exception.CanNotOpenAccountException;
+import info.ernestas.revoluttest.exception.MoneyCanNotBeTransferedException;
 import info.ernestas.revoluttest.model.Account;
 import info.ernestas.revoluttest.model.AccountOpenInfo;
 import info.ernestas.revoluttest.repository.AccountRepository;
@@ -29,7 +30,7 @@ public class AccountService {
     public Account open(AccountOpenInfo accountOpenInfo) {
         String accountNumber = generateAccountNumber(accountOpenInfo);
 
-        Account account = accountRepository.save(new Account(accountOpenInfo.getName(), accountNumber, 0.0));
+        Account account = accountRepository.save(new Account(accountOpenInfo.getName(), accountNumber, 100.0));
 
         LOGGER.info("Account {} has been opened", account.getAccountNumber());
 
@@ -44,6 +45,23 @@ public class AccountService {
         }
 
         return account.get();
+    }
+
+    public synchronized void transfer(String accountFrom, String accountTo, double amount) {
+        Account firstAccount = get(accountFrom);
+        if (firstAccount.getBalance() < amount) {
+            throw new MoneyCanNotBeTransferedException("Account " + accountFrom + " does not have enough balance to transfer " + amount);
+        }
+
+        Account secondAccount = get(accountTo);
+
+        Account updatedFirstAccount = new Account(firstAccount.getName(), firstAccount.getAccountNumber(), firstAccount.getBalance() - amount);
+        Account updatedSecondAccount = new Account(secondAccount.getName(), secondAccount.getAccountNumber(), secondAccount.getBalance() + amount);
+
+        accountRepository.update(updatedFirstAccount.getAccountNumber(), updatedFirstAccount);
+        accountRepository.update(updatedSecondAccount.getAccountNumber(), updatedSecondAccount);
+
+        LOGGER.info("{} has been transfered from account {} to account {}", amount, accountFrom, accountTo);
     }
 
     private String generateAccountNumber(AccountOpenInfo accountOpenInfo) {

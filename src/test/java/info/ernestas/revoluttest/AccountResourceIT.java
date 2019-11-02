@@ -5,6 +5,7 @@ import info.ernestas.revoluttest.util.JacksonUtil;
 import org.apache.http.HttpResponse;
 import org.apache.http.client.methods.HttpGet;
 import org.apache.http.client.methods.HttpPost;
+import org.apache.http.client.methods.HttpPut;
 import org.apache.http.entity.StringEntity;
 import org.apache.http.impl.client.CloseableHttpClient;
 import org.apache.http.impl.client.HttpClients;
@@ -21,9 +22,15 @@ public class AccountResourceIT {
 
     private static final int PORT = 8090;
 
-    private static final JettyServer JETTY_SERVER = new JettyServer();
-    public static final int STATUS_CODE_OK = 200;
+    private static final String ACCOUNT_URL = "http://localhost:8090/account/";
+    private static final String APPLICATION_JSON = "application/json";
+    private static final String JOHN_DOE = "John Doe";
+    private static final int STATUS_CODE_OK = 200;
 
+    private static final JettyServer JETTY_SERVER = new JettyServer();
+
+    private HttpResponse johnDoeResponse;
+    private Account johnDoeAccount;
     private CloseableHttpClient client;
     private static Server SERVER;
 
@@ -40,8 +47,11 @@ public class AccountResourceIT {
     }
 
     @BeforeEach
-    void setup() {
+    void setup() throws IOException {
         client = HttpClients.createDefault();
+
+        johnDoeResponse = sendPostRequest(ACCOUNT_URL, "{\"name\": \"" + JOHN_DOE + "\"}");
+        johnDoeAccount = JacksonUtil.toObject(johnDoeResponse.getEntity().getContent(), Account.class);
     }
 
     @AfterEach
@@ -50,43 +60,68 @@ public class AccountResourceIT {
     }
 
     @Test
-    void openAccount() throws IOException {
-        HttpResponse response = openAccountRequest();
-
-        Account account = JacksonUtil.toObject(response.getEntity().getContent(), Account.class);
-
-        assertThat(response.getStatusLine().getStatusCode(), is(STATUS_CODE_OK));
-        assertThat(account.getName(), is("John Doe"));
-        assertThat(account.getAccountNumber(), is(notNullValue()));
-        assertThat(account.getBalance(), is(0.0));
+    void openAccount() {
+        assertThat(johnDoeResponse.getStatusLine().getStatusCode(), is(STATUS_CODE_OK));
+        assertThat(johnDoeAccount.getName(), is(JOHN_DOE));
+        assertThat(johnDoeAccount.getAccountNumber(), is(notNullValue()));
+        assertThat(johnDoeAccount.getBalance(), is(100.0));
     }
 
     @Test
     void getAccountInformation() throws IOException {
-        HttpResponse openAccountResponse = openAccountRequest();
-        Account account = JacksonUtil.toObject(openAccountResponse.getEntity().getContent(), Account.class);
-
-        HttpGet request = new HttpGet("http://localhost:8090/account/" + account.getAccountNumber());
-
-        HttpResponse response = client.execute(request);
+        HttpResponse response = executeGetAccountRequest(johnDoeAccount.getAccountNumber());
 
         assertThat(response.getStatusLine().getStatusCode(), is(STATUS_CODE_OK));
-        assertThat(account.getName(), is("John Doe"));
-        assertThat(account.getAccountNumber(), is(notNullValue()));
-        assertThat(account.getBalance(), is(0.0));
+        assertThat(johnDoeAccount.getName(), is(JOHN_DOE));
+        assertThat(johnDoeAccount.getAccountNumber(), is(notNullValue()));
+        assertThat(johnDoeAccount.getBalance(), is(100.0));
     }
 
-    private HttpResponse openAccountRequest() throws IOException {
-        String url = "http://localhost:8090/account/";
+    @Test
+    void transfer() throws IOException {
+        HttpResponse janeDoeResponse = sendPostRequest(ACCOUNT_URL,"{\"name\": \"Jane Doe\"}");
+        Account janeDoeAccount = JacksonUtil.toObject(janeDoeResponse.getEntity().getContent(), Account.class);
+
+        final int amount = 10;
+        final String requestAsJson = "{ \"accountFrom\": \"" + johnDoeAccount.getAccountNumber() + "\", \"accountTo\": \"" + janeDoeAccount.getAccountNumber() + "\", \"amount\": \"" + amount + "\" }";
+        sendPutRequest(ACCOUNT_URL + "/transfer", requestAsJson);
+
+        HttpResponse updatedJohnAccount = executeGetAccountRequest(johnDoeAccount.getAccountNumber());
+        Account john = JacksonUtil.toObject(updatedJohnAccount.getEntity().getContent(), Account.class);
+
+        HttpResponse updatedJaneAccount = executeGetAccountRequest(janeDoeAccount.getAccountNumber());
+        Account jane = JacksonUtil.toObject(updatedJaneAccount.getEntity().getContent(), Account.class);
+
+        assertThat(john.getBalance(), is(johnDoeAccount.getBalance() - amount));
+        assertThat(jane.getBalance(), is(janeDoeAccount.getBalance() + amount));
+    }
+
+    private HttpResponse sendPostRequest(String url, String requestAsJson) throws IOException {
         HttpPost httpPost = new HttpPost(url);
 
-        String createAccountRequest = "{\"name\": \"John Doe\"}";
-        StringEntity entity = new StringEntity(createAccountRequest);
+        StringEntity entity = new StringEntity(requestAsJson);
         httpPost.setEntity(entity);
-        httpPost.setHeader("Accept", "application/json");
-        httpPost.setHeader("Content-type", "application/json");
+        httpPost.setHeader("Accept", APPLICATION_JSON);
+        httpPost.setHeader("Content-type", APPLICATION_JSON);
 
         return client.execute(httpPost);
+    }
+
+    private HttpResponse sendPutRequest(String url, String requestAsJson) throws IOException {
+        HttpPut httpPut = new HttpPut(url);
+
+        StringEntity entity = new StringEntity(requestAsJson);
+        httpPut.setEntity(entity);
+        httpPut.setHeader("Accept", APPLICATION_JSON);
+        httpPut.setHeader("Content-type", APPLICATION_JSON);
+
+        return client.execute(httpPut);
+    }
+
+    private HttpResponse executeGetAccountRequest(String accountNumber) throws IOException {
+        HttpGet request = new HttpGet(ACCOUNT_URL + accountNumber);
+
+        return client.execute(request);
     }
 
 }

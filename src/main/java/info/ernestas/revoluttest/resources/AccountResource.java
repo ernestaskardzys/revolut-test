@@ -2,6 +2,7 @@ package info.ernestas.revoluttest.resources;
 
 import info.ernestas.revoluttest.model.Account;
 import info.ernestas.revoluttest.model.AccountOpenInfo;
+import info.ernestas.revoluttest.model.TransferInfo;
 import info.ernestas.revoluttest.service.AccountService;
 import org.glassfish.jersey.server.ManagedAsync;
 
@@ -35,6 +36,14 @@ public class AccountResource {
     @Produces(MediaType.APPLICATION_JSON)
     public Account openAccount(AccountOpenInfo accountOpenInfo) {
         return accountService.open(accountOpenInfo);
+    }
+
+    @PUT
+    @Path("/transfer")
+    @Consumes(MediaType.APPLICATION_JSON)
+    @Produces(MediaType.APPLICATION_JSON)
+    public void transfer(TransferInfo transferInfo) {
+        accountService.transfer(transferInfo.getAccountFrom(), transferInfo.getAccountTo(), transferInfo.getAmount());
     }
 
 }

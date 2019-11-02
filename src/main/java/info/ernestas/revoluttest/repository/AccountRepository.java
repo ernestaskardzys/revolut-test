@@ -1,5 +1,6 @@
 package info.ernestas.revoluttest.repository;
 
+import info.ernestas.revoluttest.exception.AccountCanNotBeUpdatedException;
 import info.ernestas.revoluttest.model.Account;
 
 import java.util.Optional;
@@ -21,6 +22,16 @@ public class AccountRepository {
         REPOSITORY.put(account.getAccountNumber(), account);
 
         return account;
+    }
+
+    public void update(String accountNumber, Account updatedAccount) {
+        Account account = REPOSITORY.get(accountNumber);
+
+        if (account != null) {
+            REPOSITORY.put(accountNumber, updatedAccount);
+        } else {
+            throw new AccountCanNotBeUpdatedException("Account " + accountNumber + " can not be updated!");
+        }
     }
 
 }
