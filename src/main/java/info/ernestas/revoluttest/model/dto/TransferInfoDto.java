@@ -1,18 +1,18 @@
-package info.ernestas.revoluttest.model;
+package info.ernestas.revoluttest.model.dto;
 
-public class TransferInfo {
+public class TransferInfoDto {
 
     private final String accountFrom;
     private final String accountTo;
     private final double amount;
 
-    public TransferInfo() {
+    public TransferInfoDto() {
         accountFrom = null;
         accountTo = null;
         amount = 0.0;
     }
 
-    public TransferInfo(String accountFrom, String accountTo, double amount) {
+    public TransferInfoDto(String accountFrom, String accountTo, double amount) {
         this.accountFrom = accountFrom;
         this.accountTo = accountTo;
         this.amount = amount;

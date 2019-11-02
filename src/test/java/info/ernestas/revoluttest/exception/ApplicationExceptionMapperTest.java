@@ -1,6 +1,7 @@
 package info.ernestas.revoluttest.exception;
 
-import info.ernestas.revoluttest.model.ExceptionDto;
+import info.ernestas.revoluttest.exception.mapper.ApplicationExceptionMapper;
+import info.ernestas.revoluttest.model.dto.ExceptionDto;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 

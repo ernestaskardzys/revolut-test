@@ -1,19 +1,14 @@
 package info.ernestas.revoluttest.service;
 
 import info.ernestas.revoluttest.exception.AccountDoesNotExistException;
-import info.ernestas.revoluttest.exception.CanNotOpenAccountException;
 import info.ernestas.revoluttest.exception.MoneyCanNotBeTransferedException;
 import info.ernestas.revoluttest.model.Account;
-import info.ernestas.revoluttest.model.AccountOpenInfo;
 import info.ernestas.revoluttest.repository.AccountRepository;
+import info.ernestas.revoluttest.util.AccountNumberUtil;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import javax.inject.Inject;
-import java.nio.charset.StandardCharsets;
-import java.security.MessageDigest;
-import java.security.NoSuchAlgorithmException;
-import java.time.LocalDateTime;
 import java.util.Optional;
 
 public class AccountService {
@@ -27,10 +22,10 @@ public class AccountService {
         this.accountRepository = accountRepository;
     }
 
-    public Account open(AccountOpenInfo accountOpenInfo) {
-        String accountNumber = generateAccountNumber(accountOpenInfo);
+    public Account open(String name) {
+        String accountNumber = AccountNumberUtil.generateAccountNumber(name);
 
-        Account account = accountRepository.save(new Account(accountOpenInfo.getName(), accountNumber, 100.0));
+        Account account = accountRepository.save(new Account(name, accountNumber, 100.0));
 
         LOGGER.info("Account {} has been opened", account.getAccountNumber());
 
@@ -61,32 +56,7 @@ public class AccountService {
         accountRepository.update(updatedFirstAccount.getAccountNumber(), updatedFirstAccount);
         accountRepository.update(updatedSecondAccount.getAccountNumber(), updatedSecondAccount);
 
-        LOGGER.info("{} has been transfered from account {} to account {}", amount, accountFrom, accountTo);
-    }
-
-    private String generateAccountNumber(AccountOpenInfo accountOpenInfo) {
-        try {
-            MessageDigest digest = MessageDigest.getInstance("SHA-256");
-            String message = accountOpenInfo.getName() + LocalDateTime.now();
-            byte[] hash = digest.digest(message.getBytes(StandardCharsets.UTF_8));
-
-            return bytesToHex(hash);
-        } catch (NoSuchAlgorithmException e) {
-            throw new CanNotOpenAccountException("Can not generate account number");
-        }
-    }
-
-    private static String bytesToHex(byte[] hash) {
-        StringBuffer hexString = new StringBuffer();
-        for (int i = 0; i < hash.length; i++) {
-            String hex = Integer.toHexString(0xff & hash[i]);
-            if (hex.length() == 1) {
-                hexString.append('0');
-            }
-
-            hexString.append(hex);
-        }
-        return hexString.toString();
+        LOGGER.info("{} has been transferred from account {} to account {}", amount, accountFrom, accountTo);
     }
 
 }

@@ -1,4 +1,4 @@
-package info.ernestas.revoluttest.model;
+package info.ernestas.revoluttest.model.dto;
 
 public class ExceptionDto {
 

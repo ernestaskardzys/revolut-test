@@ -1,8 +1,9 @@
 package info.ernestas.revoluttest.resources;
 
 import info.ernestas.revoluttest.model.Account;
-import info.ernestas.revoluttest.model.AccountOpenInfo;
-import info.ernestas.revoluttest.model.TransferInfo;
+import info.ernestas.revoluttest.model.dto.AccountDto;
+import info.ernestas.revoluttest.model.dto.AccountOpenInfoDto;
+import info.ernestas.revoluttest.model.dto.TransferInfoDto;
 import info.ernestas.revoluttest.service.AccountService;
 import org.glassfish.jersey.server.ManagedAsync;
 
@@ -28,22 +29,22 @@ public class AccountResource {
     @ManagedAsync
     public void getAccount(@PathParam("accountNumber") String accountNumber, @Suspended AsyncResponse asyncResponse) {
         Account account = accountService.get(accountNumber);
-        asyncResponse.resume(account);
+        asyncResponse.resume(AccountDto.from(account));
     }
 
     @POST
     @Consumes(MediaType.APPLICATION_JSON)
     @Produces(MediaType.APPLICATION_JSON)
-    public Account openAccount(AccountOpenInfo accountOpenInfo) {
-        return accountService.open(accountOpenInfo);
+    public AccountDto openAccount(AccountOpenInfoDto accountOpenInfoDto) {
+        return AccountDto.from(accountService.open(accountOpenInfoDto.getName()));
     }
 
     @PUT
     @Path("/transfer")
     @Consumes(MediaType.APPLICATION_JSON)
     @Produces(MediaType.APPLICATION_JSON)
-    public void transfer(TransferInfo transferInfo) {
-        accountService.transfer(transferInfo.getAccountFrom(), transferInfo.getAccountTo(), transferInfo.getAmount());
+    public void transfer(TransferInfoDto transferInfoDto) {
+        accountService.transfer(transferInfoDto.getAccountFrom(), transferInfoDto.getAccountTo(), transferInfoDto.getAmount());
     }
 
 }

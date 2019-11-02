@@ -4,7 +4,6 @@ import info.ernestas.revoluttest.data.AccountTestData;
 import info.ernestas.revoluttest.exception.AccountDoesNotExistException;
 import info.ernestas.revoluttest.exception.MoneyCanNotBeTransferedException;
 import info.ernestas.revoluttest.model.Account;
-import info.ernestas.revoluttest.model.AccountOpenInfo;
 import info.ernestas.revoluttest.repository.AccountRepository;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -31,18 +30,13 @@ class AccountServiceTest {
 
         accountService = new AccountService(accountRepository);
 
-        AccountOpenInfo johnJuniorAccount = new AccountOpenInfo("John Junior");
-        AccountOpenInfo jackBlackAccount = new AccountOpenInfo("Jack Black");
-
-        firstAccount = accountService.open(johnJuniorAccount);
-        secondAccount = accountService.open(jackBlackAccount);
+        firstAccount = accountService.open("John Junior");
+        secondAccount = accountService.open("Jack Black");
     }
 
     @Test
     void open() {
-        AccountOpenInfo info = new AccountOpenInfo(JOHN_DOE);
-
-        Account account = accountService.open(info);
+        Account account = accountService.open(JOHN_DOE);
 
         assertThat(account.getName(), is(JOHN_DOE));
         assertThat(account.getAccountNumber(), is(notNullValue()));
