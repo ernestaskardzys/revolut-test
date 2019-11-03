@@ -30,4 +30,7 @@ public class Account {
         return balance;
     }
 
+    public static Account from(Account account, double balance) {
+        return new Account(account.getName(), account.getAccountNumber(), balance);
+    }
 }

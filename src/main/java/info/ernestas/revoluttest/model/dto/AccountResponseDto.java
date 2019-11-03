@@ -2,19 +2,19 @@ package info.ernestas.revoluttest.model.dto;
 
 import info.ernestas.revoluttest.model.Account;
 
-public class AccountDto {
+public class AccountResponseDto {
 
     private final String name;
     private final String accountNumber;
     private final double balance;
 
-    public AccountDto() {
+    public AccountResponseDto() {
         name = null;
         accountNumber = null;
         balance = 0.0;
     }
 
-    public AccountDto(String name, String accountNumber, double balance) {
+    public AccountResponseDto(String name, String accountNumber, double balance) {
         this.name = name;
         this.accountNumber = accountNumber;
         this.balance = balance;
@@ -32,7 +32,7 @@ public class AccountDto {
         return balance;
     }
 
-    public static AccountDto from(Account account) {
-        return new AccountDto(account.getName(), account.getAccountNumber(), account.getBalance());
+    public static AccountResponseDto from(Account account) {
+        return new AccountResponseDto(account.getName(), account.getAccountNumber(), account.getBalance());
     }
 }

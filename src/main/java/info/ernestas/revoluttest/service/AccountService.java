@@ -50,8 +50,8 @@ public class AccountService {
 
         Account secondAccount = get(accountTo);
 
-        Account updatedFirstAccount = new Account(firstAccount.getName(), firstAccount.getAccountNumber(), firstAccount.getBalance() - amount);
-        Account updatedSecondAccount = new Account(secondAccount.getName(), secondAccount.getAccountNumber(), secondAccount.getBalance() + amount);
+        Account updatedFirstAccount = Account.from(firstAccount, firstAccount.getBalance() - amount);
+        Account updatedSecondAccount = Account.from(secondAccount, secondAccount.getBalance() + amount);
 
         accountRepository.update(updatedFirstAccount.getAccountNumber(), updatedFirstAccount);
         accountRepository.update(updatedSecondAccount.getAccountNumber(), updatedSecondAccount);

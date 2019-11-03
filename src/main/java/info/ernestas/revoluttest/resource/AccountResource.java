@@ -1,9 +1,10 @@
 package info.ernestas.revoluttest.resource;
 
 import info.ernestas.revoluttest.model.Account;
-import info.ernestas.revoluttest.model.dto.AccountDto;
-import info.ernestas.revoluttest.model.dto.AccountOpenInfoDto;
-import info.ernestas.revoluttest.model.dto.TransferInfoDto;
+import info.ernestas.revoluttest.model.dto.AccountResponseDto;
+import info.ernestas.revoluttest.model.dto.AccountOpenDto;
+import info.ernestas.revoluttest.model.dto.TransferDto;
+import info.ernestas.revoluttest.model.dto.TransferResponseDto;
 import info.ernestas.revoluttest.service.AccountService;
 import org.glassfish.jersey.server.ManagedAsync;
 
@@ -12,6 +13,7 @@ import javax.ws.rs.*;
 import javax.ws.rs.container.AsyncResponse;
 import javax.ws.rs.container.Suspended;
 import javax.ws.rs.core.MediaType;
+import javax.ws.rs.core.Response;
 
 @Path("/account")
 public class AccountResource {
@@ -27,24 +29,28 @@ public class AccountResource {
     @Path("/{accountNumber}")
     @Produces(MediaType.APPLICATION_JSON)
     @ManagedAsync
-    public void getAccount(@PathParam("accountNumber") String accountNumber, @Suspended AsyncResponse asyncResponse) {
-        Account account = accountService.get(accountNumber);
-        asyncResponse.resume(AccountDto.from(account));
+    public void getAccount(@PathParam("accountNumber") String accountNumber, @Suspended final AsyncResponse asyncResponse) {
+        final Account account = accountService.get(accountNumber);
+        asyncResponse.resume(AccountResponseDto.from(account));
     }
 
     @POST
     @Consumes(MediaType.APPLICATION_JSON)
     @Produces(MediaType.APPLICATION_JSON)
-    public AccountDto openAccount(AccountOpenInfoDto accountOpenInfoDto) {
-        return AccountDto.from(accountService.open(accountOpenInfoDto.getName()));
+    @ManagedAsync
+    public void openAccount(AccountOpenDto accountOpenDto, @Suspended final AsyncResponse asyncResponse) {
+        final AccountResponseDto account = AccountResponseDto.from(accountService.open(accountOpenDto.getName()));
+        asyncResponse.resume(Response.ok().entity(account).build());
     }
 
     @PUT
     @Path("/transfer")
     @Consumes(MediaType.APPLICATION_JSON)
     @Produces(MediaType.APPLICATION_JSON)
-    public void transfer(TransferInfoDto transferInfoDto) {
-        accountService.transfer(transferInfoDto.getAccountFrom(), transferInfoDto.getAccountTo(), transferInfoDto.getAmount());
+    @ManagedAsync
+    public void transfer(TransferDto transferDto, @Suspended final AsyncResponse asyncResponse) {
+        accountService.transfer(transferDto.getAccountFrom(), transferDto.getAccountTo(), transferDto.getAmount());
+        asyncResponse.resume(Response.ok().entity(TransferResponseDto.from(transferDto)).build());
     }
 
 }

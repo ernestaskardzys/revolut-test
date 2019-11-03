@@ -1,14 +1,14 @@
 package info.ernestas.revoluttest.model.dto;
 
-public class AccountOpenInfoDto {
+public class AccountOpenDto {
 
     private final String name;
 
-    public AccountOpenInfoDto() {
+    public AccountOpenDto() {
         name = null;
     }
 
-    public AccountOpenInfoDto(String name) {
+    public AccountOpenDto(String name) {
         this.name = name;
     }
 
