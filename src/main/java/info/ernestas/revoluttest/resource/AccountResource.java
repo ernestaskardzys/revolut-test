@@ -14,10 +14,12 @@ import javax.ws.rs.container.AsyncResponse;
 import javax.ws.rs.container.Suspended;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
+import java.util.concurrent.TimeUnit;
 
 @Path("/account")
 public class AccountResource {
 
+    public static final int FIVE = 5;
     private final AccountService accountService;
 
     @Inject
@@ -30,6 +32,8 @@ public class AccountResource {
     @Produces(MediaType.APPLICATION_JSON)
     @ManagedAsync
     public void getAccount(@PathParam("accountNumber") String accountNumber, @Suspended final AsyncResponse asyncResponse) {
+        asyncResponse.setTimeout(FIVE, TimeUnit.SECONDS);
+
         final Account account = accountService.get(accountNumber);
         asyncResponse.resume(AccountResponseDto.from(account));
     }
@@ -39,6 +43,8 @@ public class AccountResource {
     @Produces(MediaType.APPLICATION_JSON)
     @ManagedAsync
     public void openAccount(AccountOpenDto accountOpenDto, @Suspended final AsyncResponse asyncResponse) {
+        asyncResponse.setTimeout(FIVE, TimeUnit.SECONDS);
+
         final AccountResponseDto account = AccountResponseDto.from(accountService.open(accountOpenDto.getName()));
         asyncResponse.resume(Response.ok().entity(account).build());
     }
@@ -49,6 +55,8 @@ public class AccountResource {
     @Produces(MediaType.APPLICATION_JSON)
     @ManagedAsync
     public void transfer(TransferDto transferDto, @Suspended final AsyncResponse asyncResponse) {
+        asyncResponse.setTimeout(FIVE, TimeUnit.SECONDS);
+
         accountService.transfer(transferDto.getAccountFrom(), transferDto.getAccountTo(), transferDto.getAmount());
         final TransferResponseDto response = TransferResponseDto.from(transferDto);
         asyncResponse.resume(Response.ok().entity(response).build());

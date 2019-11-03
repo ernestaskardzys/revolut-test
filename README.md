@@ -56,6 +56,9 @@ curl --header "Content-Type: application/json" \
   --request PUT \
   --data '{ "accountFrom": "fc6980762fe2a6ff6c1a293ee9be0995f56deb854874e65918bbb6ae6cbd316f", "accountTo": "e0d9584fd495f3e82ad97fe0a6a73d087a578e21edabfb89cb598268d6992a66", "amount": "50" }' \
   http://localhost:8080/account/transfer
+
+<...>
+{"amount":50.0,"transferred":true}
 ```
 
 - In case error appears, you'd get an exception in JSON format. For instance:
@@ -66,6 +69,15 @@ curl --header "Content-Type: application/json" \
     "message":"Account fa03cf8812d6bc4e480e64783d866f72d12099aba281981890465d8fa8fceb29 does not have enough balance to transfer 50.0"
 }
 ```
+
+- Default HTTP timeout is 5 seconds, you'd get an exception in JSON format. For instance:
+
+``bash
+{
+    "errorCode":500,
+    "message":"HTTP 503 Service Unavailable"
+}
+``
 
 ### Technologies used
 

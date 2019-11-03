@@ -1,6 +1,7 @@
 package info.ernestas.revoluttest;
 
-import info.ernestas.revoluttest.model.Account;
+import info.ernestas.revoluttest.model.dto.AccountResponseDto;
+import info.ernestas.revoluttest.model.dto.TransferResponseDto;
 import org.apache.http.HttpResponse;
 import org.apache.http.client.methods.HttpGet;
 import org.apache.http.client.methods.HttpPost;
@@ -18,6 +19,7 @@ import java.io.IOException;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.is;
 import static org.hamcrest.Matchers.notNullValue;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 public class AccountResourceIT {
 
@@ -29,7 +31,7 @@ public class AccountResourceIT {
     private static final JettyServer JETTY_SERVER = new JettyServer();
 
     private HttpResponse johnDoeResponse;
-    private Account johnDoeAccount;
+    private AccountResponseDto johnDoeAccount;
     private CloseableHttpClient client;
     private static Server SERVER;
 
@@ -50,7 +52,7 @@ public class AccountResourceIT {
         client = HttpClients.createDefault();
 
         johnDoeResponse = sendPostRequest(ACCOUNT_URL, "{\"name\": \"" + JOHN_DOE + "\"}");
-        johnDoeAccount = JacksonUtil.toObject(johnDoeResponse.getEntity().getContent(), Account.class);
+        johnDoeAccount = JacksonUtil.toObject(johnDoeResponse.getEntity().getContent(), AccountResponseDto.class);
     }
 
     @AfterEach
@@ -79,24 +81,29 @@ public class AccountResourceIT {
     @Test
     void transfer() throws IOException {
         HttpResponse janeDoeResponse = sendPostRequest(ACCOUNT_URL,"{\"name\": \"Jane Doe\"}");
-        Account janeDoeAccount = JacksonUtil.toObject(janeDoeResponse.getEntity().getContent(), Account.class);
+        AccountResponseDto janeDoeAccount = JacksonUtil.toObject(janeDoeResponse.getEntity().getContent(), AccountResponseDto.class);
 
-        final int amount = 10;
-        transfer(janeDoeAccount, amount);
+        final double amount = 10.0;
+        TransferResponseDto transferResult = transfer(janeDoeAccount, amount);
+
+        assertThat(transferResult.getAmount(), is(amount));
+        assertTrue(transferResult.isTransferred());
 
         HttpResponse updatedJohnAccount = executeGetAccountRequest(johnDoeAccount.getAccountNumber());
-        Account john = JacksonUtil.toObject(updatedJohnAccount.getEntity().getContent(), Account.class);
+        AccountResponseDto john = JacksonUtil.toObject(updatedJohnAccount.getEntity().getContent(), AccountResponseDto.class);
 
         HttpResponse updatedJaneAccount = executeGetAccountRequest(janeDoeAccount.getAccountNumber());
-        Account jane = JacksonUtil.toObject(updatedJaneAccount.getEntity().getContent(), Account.class);
+        AccountResponseDto jane = JacksonUtil.toObject(updatedJaneAccount.getEntity().getContent(), AccountResponseDto.class);
 
         assertThat(john.getBalance(), is(johnDoeAccount.getBalance() - amount));
         assertThat(jane.getBalance(), is(janeDoeAccount.getBalance() + amount));
     }
 
-    private void transfer(Account janeDoeAccount, int amount) throws IOException {
+    private TransferResponseDto transfer(AccountResponseDto janeDoeAccount, double amount) throws IOException {
         final String requestAsJson = "{ \"accountFrom\": \"" + johnDoeAccount.getAccountNumber() + "\", \"accountTo\": \"" + janeDoeAccount.getAccountNumber() + "\", \"amount\": \"" + amount + "\" }";
-        sendPutRequest(ACCOUNT_URL + "/transfer", requestAsJson);
+        HttpResponse response = sendPutRequest(ACCOUNT_URL + "/transfer", requestAsJson);
+
+        return JacksonUtil.toObject(response.getEntity().getContent(), TransferResponseDto.class);
     }
 
     private HttpResponse sendPostRequest(String url, String requestAsJson) throws IOException {
