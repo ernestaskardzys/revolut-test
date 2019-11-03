@@ -72,12 +72,12 @@ curl --header "Content-Type: application/json" \
 
 - Default HTTP timeout is 5 seconds, you'd get an exception in JSON format. For instance:
 
-``bash
+```bash
 {
     "errorCode":500,
     "message":"HTTP 503 Service Unavailable"
 }
-``
+```
 
 ### Technologies used
 
