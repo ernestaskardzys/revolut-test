@@ -50,7 +50,8 @@ public class AccountResource {
     @ManagedAsync
     public void transfer(TransferDto transferDto, @Suspended final AsyncResponse asyncResponse) {
         accountService.transfer(transferDto.getAccountFrom(), transferDto.getAccountTo(), transferDto.getAmount());
-        asyncResponse.resume(Response.ok().entity(TransferResponseDto.from(transferDto)).build());
+        final TransferResponseDto response = TransferResponseDto.from(transferDto);
+        asyncResponse.resume(Response.ok().entity(response).build());
     }
 
 }

@@ -18,10 +18,8 @@ public class AccountRepository {
         return Optional.of(REPOSITORY.get(accountNumber));
     }
 
-    public Account save(Account account) {
+    public void save(Account account) {
         REPOSITORY.put(account.getAccountNumber(), account);
-
-        return account;
     }
 
     public void update(String accountNumber, Account updatedAccount) {

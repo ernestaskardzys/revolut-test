@@ -29,8 +29,9 @@ class AccountRepositoryTest {
 
     @Test
     void save() {
-        Account resultingAccount = accountRepository.save(FIRST_ACCOUNT);
+        accountRepository.save(FIRST_ACCOUNT);
 
+        Account resultingAccount = accountRepository.get(FIRST_ACCOUNT.getAccountNumber()).get();
         assertThat(resultingAccount.getName(), is(FIRST_ACCOUNT.getName()));
         assertThat(resultingAccount.getAccountNumber(), is(FIRST_ACCOUNT.getAccountNumber()));
         assertThat(resultingAccount.getBalance(), is(FIRST_ACCOUNT.getBalance()));

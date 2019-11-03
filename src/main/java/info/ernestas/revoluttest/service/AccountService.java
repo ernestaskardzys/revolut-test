@@ -15,6 +15,8 @@ public class AccountService {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(AccountService.class);
 
+    private static final double ONE_HUNDRED = 100.0;
+
     private final AccountRepository accountRepository;
 
     @Inject
@@ -24,8 +26,9 @@ public class AccountService {
 
     public Account open(String name) {
         String accountNumber = AccountNumberUtil.generateAccountNumber(name);
+        Account account = new Account(name, accountNumber, ONE_HUNDRED);
 
-        Account account = accountRepository.save(new Account(name, accountNumber, 100.0));
+        accountRepository.save(account);
 
         LOGGER.info("Account {} has been opened", account.getAccountNumber());
 
